@@ -7,14 +7,6 @@ use winapi::shared::ntdef::LPWSTR;
 use winapi::um::errhandlingapi::{GetLastError, SetLastError};
 use winapi::um::winbase::*;
 
-fn errno_fmt_fallback(f: &mut Formatter, e: i32) -> fmt::Result {
-    write!(f, "error 0x{:04x}", e as DWORD)
-}
-
-fn write_utf16_lossy(f: &mut Formatter, s: &[u16]) -> fmt::Result {
-    write!(f, "{}", UStr::from_slice(s).display())
-}
-
 struct Buf(LPWSTR);
 
 impl Drop for Buf {
@@ -34,11 +26,14 @@ pub fn errno_fmt(e: i32, f: &mut Formatter) -> fmt::Result {
         0,
         null_mut()
     ) };
-    if msg_len == 0 { return errno_fmt_fallback(f, e); }
+    if msg_len == 0 {
+        return write!(f, "error 0x{:04x}", e as DWORD);
+    }
     let buf = Buf(buf);
     let msg = unsafe { slice::from_raw_parts(buf.0, msg_len as usize) };
-    let msg = msg.trim_end_matches(|c| c == '\r' || c == '\n');
-    write_utf16_lossy(f, msg)
+    let trim = msg.iter().rev().take_while(|&&w| w == b'\r' as u16 || w == b'\n' as u16).count();
+    let msg = UStr::from_slice(&msg[.. msg.len() - trim]);
+    write!(f, "{}", msg.display())
 }
 
 pub fn errno_raw() -> i32 { 
