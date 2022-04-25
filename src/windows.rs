@@ -37,6 +37,7 @@ pub fn errno_fmt(e: i32, f: &mut Formatter) -> fmt::Result {
     if msg_len == 0 { return errno_fmt_fallback(f, e); }
     let buf = Buf(buf);
     let msg = unsafe { slice::from_raw_parts(buf.0, msg_len as usize) };
+    let msg = msg.trim_end_matches(|c| c == '\r' || c == '\n');
     write_utf16_lossy(f, msg)
 }
 

@@ -89,7 +89,8 @@ mod test {
         let mut buf = Buf { s: buf, len: 0 };
         write!(&mut buf, "{}", Errno(e)).unwrap();
         let res = &buf.s[.. buf.len];
-        !res.is_empty() && res.chars().last().unwrap().is_ascii_alphanumeric()
+        let end = res.chars().last();
+        end.is_some() && end.unwrap().is_ascii_alphanumeric() && !end.unwrap().is_whitespace()
     }
 }
 /*
