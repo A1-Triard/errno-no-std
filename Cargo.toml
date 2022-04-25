@@ -24,3 +24,8 @@ libc = { version = "0.2.124", default-features = false }
 [target.'cfg(windows)'.dependencies]
 widestring = { version = "0.5.1", default-features = false }
 winapi = { version = "0.3.9", features = ["errhandlingapi", "minwindef", "ntdef", "winbase"] }
+
+[dev-dependencies]
+copy_from_str = "1.0.5"
+quickcheck = "1.0.3"
+quickcheck_macros = "1.0.0"

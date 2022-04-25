@@ -55,6 +55,43 @@ pub fn errno() -> Errno { Errno(errno_raw()) }
 /// Sets the platform-specific value of `errno`.
 pub fn set_errno(err: Errno) { set_errno_raw(err.0) }
 
+#[cfg(test)]
+mod test {
+    use crate::*;
+    use copy_from_str::CopyFromStrExt;
+    use core::fmt::{self, Write};
+    use core::str::{self};
+    use quickcheck_macros::quickcheck;
+
+    struct Buf<'a> {
+        s: &'a mut str,
+        len: usize,
+    }
+
+    impl<'a> Write for Buf<'a> {
+        fn write_str(&mut self, s: &str) -> fmt::Result {
+            self.len = s.len();
+            self.s[.. s.len()].copy_from_str(s);
+            Ok(())
+        }
+    }
+
+    #[quickcheck]
+    fn errno_after_set_errno(e: i32) -> bool {
+        set_errno(Errno(e));
+        errno() == Errno(e)
+    }
+
+    #[quickcheck]
+    fn error_display(e: i32) -> bool {
+        let mut buf = [0; 1024];
+        let buf = str::from_utf8_mut(&mut buf[..]).unwrap();
+        let mut buf = Buf { s: buf, len: 0 };
+        write!(&mut buf, "{}", Errno(e)).unwrap();
+        let res = &buf.s[.. buf.len];
+        !res.is_empty() && res.chars().last().unwrap().is_ascii_alphanumeric()
+    }
+}
 /*
 #[test]
 fn it_works() {
