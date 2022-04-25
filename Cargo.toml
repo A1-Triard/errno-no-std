@@ -16,7 +16,7 @@ repository = "https://github.com/A1-Triard/errno-no-std"
 default = ["std"]
 std = []
 
-[target.'cfg(unix)'.dependencies]
+[target.'cfg(not(windows))'.dependencies]
 errno-sys = "0.0.1"
 iconv-sys = "0.0.3"
 libc = { version = "0.2.124", default-features = false }

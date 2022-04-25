@@ -12,9 +12,9 @@
 #[cfg(feature="std")]
 extern crate core;
 
-#[cfg(unix)]
+#[cfg(not(windows))]
 mod unix;
-#[cfg(unix)]
+#[cfg(not(windows))]
 use unix::*;
 
 #[cfg(windows)]
