@@ -1,0 +1,22 @@
+[package]
+edition = "2021"
+rust-version = "1.59"
+name = "errno-no-std"
+version = "0.0.2"
+authors = ["warlock <internalmike@gmail.com>"]
+description = "Cross-platform interface to the `errno` variable."
+readme = "README.md"
+documentation = "https://docs.rs/errno-no-std/"
+keywords = ["errno", "no_std", "unix", "windows", "linux"]
+categories = ["os", "no-std"]
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/A1-Triard/errno-no-std"
+
+[features]
+default = ["std"]
+std = []
+
+[target.'cfg(unix)'.dependencies]
+errno-sys = "0.0.1"
+iconv-sys = "0.0.3"
+libc = { version = "0.2.124", default-features = false }
