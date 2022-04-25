@@ -1,3 +1,5 @@
+# errno-no-std
+
 Cross-platform interface to the `errno` variable.
 
 An improved version of the [`errno`](https://crates.io/crates/errno) crate.
