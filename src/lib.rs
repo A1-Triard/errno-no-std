@@ -84,6 +84,7 @@ mod test {
 
     #[quickcheck]
     fn error_display(e: i32) -> bool {
+        if e == 0 { return true; }
         let mut buf = [0; 1024];
         let buf = str::from_utf8_mut(&mut buf[..]).unwrap();
         let mut buf = Buf { s: buf, len: 0 };
