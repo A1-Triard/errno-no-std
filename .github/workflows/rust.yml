@@ -30,7 +30,7 @@ jobs:
         - os: windows-latest
           rust: nightly
           features: ""
-          triple: x86_64-windows-msvc
+          triple: x86_64-pc-windows-msvc
     runs-on: ${{ matrix.os }}
     steps:
     - uses: actions/checkout@v2
