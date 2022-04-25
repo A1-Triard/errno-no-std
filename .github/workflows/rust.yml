@@ -17,15 +17,19 @@ jobs:
         os: [ubuntu-latest, macOS-latest, windows-latest]
         rust: ["1.59", stable, beta, nightly]
         triple: [""]
+        features: ["", "--features=std"]
         include:
         - os: ubuntu-latest
           rust: nightly
+          features: ""
           triple: x86_64-unknown-linux-gnu
         - os: macOS-latest
           rust: nightly
+          features: ""
           triple: x86_64-apple-darwin
         - os: windows-latest
           rust: nightly
+          features: ""
           triple: x86_64-windows-msvc
     runs-on: ${{ matrix.os }}
     steps:
@@ -38,17 +42,27 @@ jobs:
       uses: actions-rs/cargo@v1
       with:
         command: build
-        args: "--verbose"
+        args: "--verbose --no-default-features ${{ matrix.fetures }}"
+    - name: test --tests
+      uses: actions-rs/cargo@v1
+      with:
+        command: test
+        args: "--verbose --tests --no-default-features ${{ matrix.features }}"
+    - name: test --doc
+      uses: actions-rs/cargo@v1
+      with:
+        command: test
+        args: "--verbose --doc --no-default-features ${{ matrix.features }}"
     - name: doc
       uses: actions-rs/cargo@v1
       with:
         command: doc
-        args: "--verbose"
+        args: "--verbose --no-default-features ${{ matrix.fetures }}"
     - name: build --release
       uses: actions-rs/cargo@v1
       with:
         command: build
-        args: "--verbose --release"
+        args: "--verbose --release --no-default-features ${{ matrix.fetures }}"
     - name: rustup component add rust-src
       run: "rustup component add rust-src --toolchain nightly-${{ matrix.triple }}"
       if: "${{ matrix.triple != '' }}"
