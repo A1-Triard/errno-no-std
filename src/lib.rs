@@ -17,6 +17,11 @@ mod unix;
 #[cfg(unix)]
 use unix::*;
 
+#[cfg(windows)]
+mod windows;
+#[cfg(windows)]
+use windows::*;
+
 use core::fmt::{self, Formatter};
 #[cfg(feature="std")]
 use std::error::Error;

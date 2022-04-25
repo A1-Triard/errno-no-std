@@ -4,15 +4,19 @@ use core::slice::{self};
 use core::str::{self};
 use errno_sys::errno_location;
 use iconv_sys::*;
-use libc::{CODESET, c_char, c_int, nl_langinfo, strlen};
+use libc::{CODESET, E2BIG, c_char, c_int, nl_langinfo, strlen};
 
 extern "C" {
     fn strerror(errnum: c_int) -> *mut c_char;
 }
 
+fn write_byte(f: &mut Formatter, c: u8) -> fmt::Result {
+    write!(f, "\\x{:02x}", c)
+}
+
 fn write_fallback(f: &mut Formatter, s: &[u8]) -> fmt::Result {
-    for c in s {
-        write!(f, "\\x{:02x}", c)?;
+    for &c in s {
+        write_byte(f, c)?;
     }
     Ok(())
 }
@@ -37,6 +41,15 @@ fn write_utf8_lossy(f: &mut Formatter, mut s: &[u8]) -> fmt::Result {
     }
 }
 
+struct Iconv(iconv_t);
+
+impl Drop for Iconv {
+    fn drop(&mut self) {
+        let iconv_close_res = unsafe { iconv_close(self.0) };
+        debug_assert_eq!(iconv_close_res, 0);
+    }
+}
+
 pub fn errno_fmt(e: i32, f: &mut Formatter) -> fmt::Result {
     let msg = unsafe {
         let msg = strerror(e) as *const c_char;
@@ -53,27 +66,36 @@ pub fn errno_fmt(e: i32, f: &mut Formatter) -> fmt::Result {
     if c == iconv_t::ERROR {
         return write_fallback(f, msg);
     }
+    let c = Iconv(c);
     let mut msg_ptr = msg.as_ptr() as *const c_char as *mut c_char;
     let mut msg_len = msg.len();
     let mut uni_buf: [MaybeUninit<u8>; 128] = unsafe { MaybeUninit::uninit().assume_init() };
-    let mut uni_buf_ptr = uni_buf.as_mut_ptr() as *mut c_char;
-    let mut uni_buf_len = uni_buf.len();
-    let iconv_res: isize = unsafe { transmute(iconv(
-        c,
-        (&mut msg_ptr) as *mut _,
-        (&mut msg_len) as *mut _,
-        (&mut uni_buf_ptr) as *mut _,
-        (&mut uni_buf_len) as *mut _
-    )) };
-    let iconv_close_res = unsafe { iconv_close(c) };
-    debug_assert_eq!(iconv_close_res, 0);
-    if iconv_res != -1 {
-        let uni_len = uni_buf.len() - uni_buf_len;
-        let uni = &uni_buf[.. uni_len];
-        let uni = unsafe { str::from_utf8_unchecked(transmute(uni)) };
-        return write!(f, "{}", uni);
+    loop {
+        let mut uni_buf_ptr = uni_buf.as_mut_ptr() as *mut c_char;
+        let mut uni_buf_len = uni_buf.len();
+        let iconv_res: isize = unsafe { transmute(iconv(
+            c.0,
+            (&mut msg_ptr) as *mut _,
+            (&mut msg_len) as *mut _,
+            (&mut uni_buf_ptr) as *mut _,
+            (&mut uni_buf_len) as *mut _
+        )) };
+        if iconv_res == -1 && errno_raw() != E2BIG {
+            debug_assert!(msg_len > 0);
+            write_byte(f, msg[msg.len() - msg_len])?;
+            msg_ptr = unsafe { msg_ptr.add(1) };
+            msg_len -= 1;
+        } else {
+            let uni_len = uni_buf.len() - uni_buf_len;
+            let uni = &uni_buf[.. uni_len];
+            let uni = unsafe { str::from_utf8_unchecked(transmute(uni)) };
+            write!(f, "{}", uni)?;
+            if iconv_res != -1 {
+                debug_assert_eq!(msg_len, 0);
+                return Ok(());
+            }
+        }
     }
-    return write_fallback(f, msg);
 }
 
 pub fn errno_raw() -> i32 { 
