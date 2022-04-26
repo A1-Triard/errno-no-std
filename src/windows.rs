@@ -34,6 +34,7 @@ pub fn errno_fmt(e: i32, f: &mut Formatter) -> fmt::Result {
     //let trim = msg.iter().rev().take_while(|&&w| w == b'\r' as u16 || w == b'\n' as u16).count();
     //let msg = UStr::from_slice(&msg[.. msg.len() - trim]);
     let msg = U16Str::from_slice(msg);
+    debug_assert_eq!(msg.len(), msg_len);
     write!(f, "{}", msg.display())
 }
 
