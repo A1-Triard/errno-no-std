@@ -45,9 +45,6 @@ jobs:
     - name: locale-gen
       run: "sudo locale-gen"
       if: "${{ matrix.os == 'ubuntu-latest' }}"
-    - name: gen locale uk_UA.UTF-8
-      run: "sudo locale-gen 'uk_UA UTF-8'"
-      if: "${{ matrix.os == 'ubuntu-latest' }}"
     - uses: actions/checkout@v2
     - uses: actions-rs/toolchain@v1
       with:
