@@ -96,7 +96,7 @@ mod test {
         end.is_some() && end.unwrap().is_ascii_alphanumeric() && !end.unwrap().is_whitespace()
     }
 
-    #[cfg(not(windows))]
+    #[cfg(all(not(windows), not(target_os="macos")))]
     #[test]
     fn localized_messages() {
         let locales: &[&'static [u8]] = &[b"en_US.UTF-8\0", b"ja_JP.EUC-JP\0", b"uk_UA.KOI8-U\0", b"uk_UA.UTF-8\0"];
