@@ -62,6 +62,8 @@ mod test {
     use core::fmt::{self, Write};
     use core::str::{self};
     use quickcheck_macros::quickcheck;
+    #[cfg(not(windows))]
+    use libc::{LC_ALL, EACCES, setlocale};
 
     struct Buf<'a> {
         s: &'a mut str,
@@ -93,29 +95,25 @@ mod test {
         let end = res.chars().last();
         end.is_some() && end.unwrap().is_ascii_alphanumeric() && !end.unwrap().is_whitespace()
     }
-}
-/*
-#[cfg(feature = "std")]
-#[test]
-fn check_description() {
-    let expect = if cfg!(windows) {
-        "Incorrect function."
-    } else if cfg!(target_os = "illumos") {
-        "Not owner"
-    } else if cfg!(target_os = "wasi") {
-        "Argument list too long"
-    } else if cfg!(target_os = "haiku") {
-        "Operation not allowed"
-    } else {
-        "Operation not permitted"
-    };
 
-    let errno_code = if cfg!(target_os = "haiku") { -2147483633 } else { 1 };
-    set_errno(Errno(errno_code));
-
-    assert_eq!(errno().to_string(), expect);
-    assert_eq!(
-        format!("{:?}", errno()),
-        format!("Errno {{ code: {}, description: Some({:?}) }}", errno_code, expect));
+    #[cfg(not(windows))]
+    #[test]
+    fn localized_messages() {
+        let locales: &[&'static [u8]] = &[b"en_US.UTF-8\0", b"ja_JP.EUC-JP\0", b"uk_UA.KOI8-U\0", b"uk_UA.UTF-8\0"];
+        for &locale in locales {
+            unsafe { setlocale(LC_ALL, locale.as_ptr() as *const _) };
+            let msg = match locale.split(|&b| b == b'.').next().unwrap() {
+                b"en_US" => "Permission denied",
+                b"ja_JP" => "許可がありません",
+                b"uk_UA" => "Відмовлено у доступі",
+                _ => panic!("message?"),
+            };
+            let mut buf = [0; 1024];
+            let buf = str::from_utf8_mut(&mut buf[..]).unwrap();
+            let mut buf = Buf { s: buf, len: 0 };
+            write!(&mut buf, "{}", Errno(EACCES)).unwrap();
+            let res = &buf.s[.. buf.len];
+            assert_eq!(res, msg);
+        }
+    }
 }
-*/
