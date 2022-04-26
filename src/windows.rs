@@ -31,8 +31,9 @@ pub fn errno_fmt(e: i32, f: &mut Formatter) -> fmt::Result {
     }
     let buf = Buf(buf);
     let msg = unsafe { slice::from_raw_parts(buf.0, msg_len as usize) };
-    let trim = msg.iter().rev().take_while(|&&w| w == b'\r' as u16 || w == b'\n' as u16).count();
-    let msg = UStr::from_slice(&msg[.. msg.len() - trim]);
+    //let trim = msg.iter().rev().take_while(|&&w| w == b'\r' as u16 || w == b'\n' as u16).count();
+    //let msg = UStr::from_slice(&msg[.. msg.len() - trim]);
+    let msg = UStr::from_slice(msg);
     write!(f, "{}", msg.display())
 }
 
