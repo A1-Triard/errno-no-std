@@ -29,3 +29,6 @@ winapi = { version = "0.3.9", features = ["errhandlingapi", "minwindef", "ntdef"
 copy_from_str = "1.0.5"
 quickcheck = "1.0.3"
 quickcheck_macros = "1.0.0"
+
+[target.'cfg(windows)'.dev-dependencies]
+winapi = { version = "*", features = ["winerror"] }
