@@ -33,8 +33,9 @@ jobs:
           triple: x86_64-pc-windows-msvc
     runs-on: ${{ matrix.os }}
     steps:
-    - name: ls
-      run: "locale -a"
+    - name: locale-gen
+      run: "locale-gen ja_JP.EUC-JP"
+      if: "${{ matrix.os == 'ubuntu-latest' }}"
     - uses: actions/checkout@v2
     - uses: actions-rs/toolchain@v1
       with:
