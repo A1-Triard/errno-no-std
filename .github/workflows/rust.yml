@@ -34,7 +34,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
     - name: locale-gen
-      run: "locale-gen ja_JP.EUC-JP"
+      run: "sudo locale-gen ja_JP.EUC-JP"
       if: "${{ matrix.os == 'ubuntu-latest' }}"
     - uses: actions/checkout@v2
     - uses: actions-rs/toolchain@v1
