@@ -33,6 +33,8 @@ jobs:
           triple: x86_64-pc-windows-msvc
     runs-on: ${{ matrix.os }}
     steps:
+    - name: ls
+      run: "ls /usr/share/locale"
     - uses: actions/checkout@v2
     - uses: actions-rs/toolchain@v1
       with:

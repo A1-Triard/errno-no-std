@@ -95,19 +95,6 @@ mod test {
     }
 }
 /*
-#[test]
-fn it_works() {
-    let x = errno();
-    set_errno(x);
-}
-
-#[cfg(feature = "std")]
-#[test]
-fn it_works_with_to_string() {
-    let x = errno();
-    let _ = x.to_string();
-}
-
 #[cfg(feature = "std")]
 #[test]
 fn check_description() {
@@ -130,15 +117,5 @@ fn check_description() {
     assert_eq!(
         format!("{:?}", errno()),
         format!("Errno {{ code: {}, description: Some({:?}) }}", errno_code, expect));
-}
-
-#[cfg(feature = "std")]
-#[test]
-fn check_error_into_errno() {
-    const ERROR_CODE: i32 = 1;
-
-    let error = io::Error::from_raw_os_error(ERROR_CODE);
-    let new_error: io::Error = Errno(ERROR_CODE).into();
-    assert_eq!(error.kind(), new_error.kind());
 }
 */
