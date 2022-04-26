@@ -33,6 +33,9 @@ jobs:
           triple: x86_64-pc-windows-msvc
     runs-on: ${{ matrix.os }}
     steps:
+    - name: install locales
+      run: "sudo apt-get update && sudo apt-get install tzdata locales -y"
+      if: "${{ matrix.os == 'ubuntu-latest' }}"
     - name: add locale ja_JP.EUC-JP
       run: "sudo sh -c 'echo ja_JP EUC-JP >> /etc/locale.gen'"
       if: "${{ matrix.os == 'ubuntu-latest' }}"
