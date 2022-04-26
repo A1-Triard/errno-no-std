@@ -34,7 +34,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
     - name: add locale ja_JP.EUC-JP
-      run: "sudo echo 'ja_JP EUC-JP' >> /etc/locale.gen"
+      run: "sudo sh -c 'echo ja_JP EUC-JP >> /etc/locale.gen'"
       if: "${{ matrix.os == 'ubuntu-latest' }}"
     - name: locale-gen
       run: "sudo locale-gen"
