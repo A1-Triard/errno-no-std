@@ -34,16 +34,19 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
     - name: install locales
-      run: "sudo apt-get update && sudo apt-get install language-pack-ja -y"
+      run: "sudo apt-get update && sudo apt-get install language-pack-ja language-pack-uk -y"
       if: "${{ matrix.os == 'ubuntu-latest' }}"
     - name: add locale ja_JP.EUC-JP
       run: "sudo sh -c 'echo ja_JP EUC-JP >> /etc/locale.gen'"
       if: "${{ matrix.os == 'ubuntu-latest' }}"
+    - name: add locale uk_UA.KOI8-U
+      run: "sudo sh -c 'echo uk_UA KOI8-U >> /etc/locale.gen'"
+      if: "${{ matrix.os == 'ubuntu-latest' }}"
     - name: locale-gen
       run: "sudo locale-gen"
       if: "${{ matrix.os == 'ubuntu-latest' }}"
-    - name: update-locale
-      run: "sudo update-locale"
+    - name: gen locale uk_UA.UTF-8
+      run: "sudo locale-gen 'uk_UA UTF-8'"
       if: "${{ matrix.os == 'ubuntu-latest' }}"
     - uses: actions/checkout@v2
     - uses: actions-rs/toolchain@v1
