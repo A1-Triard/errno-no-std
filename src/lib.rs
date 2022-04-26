@@ -64,6 +64,8 @@ mod test {
     use quickcheck_macros::quickcheck;
     #[cfg(not(windows))]
     use libc::{LC_ALL, EACCES, setlocale};
+    #[cfg(windows)]
+    use winapi::shared::winerror::ERROR_ACCESS_DENIED;
 
     struct Buf<'a> {
         s: &'a mut str,
@@ -115,5 +117,16 @@ mod test {
             let res = &buf.s[.. buf.len];
             assert_eq!(res, msg);
         }
+    }
+
+    #[cfg(windows)]
+    #[test]
+    fn localized_messages() {
+        let mut buf = [0; 1024];
+        let buf = str::from_utf8_mut(&mut buf[..]).unwrap();
+        let mut buf = Buf { s: buf, len: 0 };
+        write!(&mut buf, "{}", Errno(ERROR_ACCESS_DENIED as _)).unwrap();
+        let res = &buf.s[.. buf.len];
+        assert_eq!(res, "Access is denied.");
     }
 }
