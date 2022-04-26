@@ -39,6 +39,9 @@ jobs:
     - name: locale-gen
       run: "sudo locale-gen"
       if: "${{ matrix.os == 'ubuntu-latest' }}"
+    - name: update-locale
+      run: "sudo update-locale"
+      if: "${{ matrix.os == 'ubuntu-latest' }}"
     - uses: actions/checkout@v2
     - uses: actions-rs/toolchain@v1
       with:
