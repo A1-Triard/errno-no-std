@@ -62,7 +62,7 @@ mod test {
     use core::fmt::{self, Write};
     use core::str::{self};
     use quickcheck_macros::quickcheck;
-    #[cfg(not(windows))]
+    #[cfg(all(not(windows), not(target_os="macos")))]
     use libc::{LC_ALL, EACCES, setlocale};
     #[cfg(windows)]
     use winapi::shared::winerror::ERROR_ACCESS_DENIED;
