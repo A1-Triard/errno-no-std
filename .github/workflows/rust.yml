@@ -33,8 +33,11 @@ jobs:
           triple: x86_64-pc-windows-msvc
     runs-on: ${{ matrix.os }}
     steps:
+    - name: add locale ja_JP.EUC-JP
+      run: "sudo echo 'ja_JP EUC-JP' >> /etc/locale.gen"
+      if: "${{ matrix.os == 'ubuntu-latest' }}"
     - name: locale-gen
-      run: "sudo locale-gen ja_JP.EUC-JP"
+      run: "sudo locale-gen"
       if: "${{ matrix.os == 'ubuntu-latest' }}"
     - uses: actions/checkout@v2
     - uses: actions-rs/toolchain@v1
