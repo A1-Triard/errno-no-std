@@ -3,7 +3,7 @@ use core::ptr::{null, null_mut};
 use core::slice::{self};
 use widestring::U16Str;
 use winapi::shared::minwindef::{DWORD, LPVOID};
-use winapi::shared::ntdef::{LPWSTR, MAKELANGID, LANG_NEUTRAL, SUBLANG_DEFAULT);
+use winapi::shared::ntdef::{LPWSTR, MAKELANGID, LANG_NEUTRAL, SUBLANG_DEFAULT};
 use winapi::um::errhandlingapi::{GetLastError, SetLastError};
 use winapi::um::winbase::*;
 
