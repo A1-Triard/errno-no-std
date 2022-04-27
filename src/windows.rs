@@ -21,7 +21,7 @@ pub fn errno_fmt(e: i32, f: &mut Formatter) -> fmt::Result {
         FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
         null(),
         e as DWORD,
-        MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+        MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT) as _,
         &mut buf as *mut _ as LPWSTR,
         0,
         null_mut()
