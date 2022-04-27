@@ -126,7 +126,7 @@ mod test {
         let mut buf = [0; 1024];
         let buf = str::from_utf8_mut(&mut buf[..]).unwrap();
         let mut buf = Buf { s: buf, len: 0 };
-        write!(&mut buf, "{}", Errno(ERROR_ACCESS_DENIED as _)).unwrap();
+        write!(&mut buf, "{}", Errno(ERROR_ACCESS_DENIED as u32 as i32)).unwrap();
         let res = &buf.s[.. buf.len];
         assert_eq!(res, "Access is denied.");
     }
