@@ -128,9 +128,7 @@ mod test {
         let mut buf = Buf { s: buf, len: 0 };
         write!(&mut buf, "{}", Errno(e)).unwrap();
         let res = &buf.s[.. buf.len];
-        assert!(res.len() > 5);
-        let end = res.chars().last();
-        assert!(end.is_some() && end.unwrap().is_ascii_alphanumeric() && !end.unwrap().is_whitespace());
+        assert_eq!(res, "err");
     }
 
     #[cfg(windows)]
