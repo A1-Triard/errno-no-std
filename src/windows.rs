@@ -3,7 +3,7 @@ use core::ptr::{null, null_mut};
 use core::slice::{self};
 use widestring::UStr;
 use winapi::shared::minwindef::{DWORD, LPVOID};
-use winapi::shared::ntdef::{LPWSTR, MAKELANGID, LANG_NEUTRAL, SUBLANG_DEFAULT};
+use winapi::shared::ntdef::{LPWSTR};
 use winapi::um::errhandlingapi::{GetLastError, SetLastError};
 use winapi::um::winbase::*;
 
@@ -21,7 +21,7 @@ pub fn errno_fmt(e: i32, f: &mut Formatter) -> fmt::Result {
         FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
         null(),
         e as DWORD,
-        MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT) as _,
+        null_mut(),
         &mut buf as *mut _ as LPWSTR,
         0,
         null_mut()
