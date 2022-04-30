@@ -87,7 +87,6 @@ mod test {
         errno() == Errno(e)
     }
 
-    /*
     #[quickcheck]
     fn error_display(e: i32) -> bool {
         if e == 0 { return true; }
@@ -100,11 +99,20 @@ mod test {
         let end = res.chars().last();
         end.is_some() && end.unwrap().is_ascii_alphanumeric() && !end.unwrap().is_whitespace()
     }
-    */
+
+    #[cfg(not(windows))]
+    struct DefaultLocale;
+
+    impl Drop for DefaultLocale {
+        fn drop(&mut self) {
+            unsafe { setlocale(LC_ALL, b"\0".as_ptr() as *const _); }
+        }
+    }
 
     #[cfg(all(not(windows), not(target_os="macos")))]
     #[test]
     fn localized_messages() {
+        let _default_locale = DefaultLocale;
         let locales: &[&'static [u8]] = &[b"en_US.UTF-8\0", b"ja_JP.EUC-JP\0", b"uk_UA.KOI8-U\0", b"uk_UA.UTF-8\0"];
         for &locale in locales {
             unsafe { setlocale(LC_ALL, locale.as_ptr() as *const _) };
