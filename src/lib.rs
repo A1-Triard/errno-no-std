@@ -74,7 +74,7 @@ mod test {
 
     impl<'a> Write for Buf<'a> {
         fn write_str(&mut self, s: &str) -> fmt::Result {
-            self.s[s.len .. s.len()].copy_from_str(s);
+            self.s[self.len .. s.len()].copy_from_str(s);
             self.len = s.len();
             Ok(())
         }
