@@ -100,9 +100,10 @@ mod test {
         end.is_some() && end.unwrap().is_ascii_alphanumeric() && !end.unwrap().is_whitespace()
     }
 
-    #[cfg(not(windows))]
+    #[cfg(all(not(windows), not(target_os="macos")))]
     struct DefaultLocale;
 
+    #[cfg(all(not(windows), not(target_os="macos")))]
     impl Drop for DefaultLocale {
         fn drop(&mut self) {
             unsafe { setlocale(LC_ALL, b"\0".as_ptr() as *const _); }
