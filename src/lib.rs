@@ -65,6 +65,8 @@ mod test {
     #[cfg(all(not(windows), not(target_os="macos")))]
     use libc::{LC_ALL, EACCES, setlocale};
     #[cfg(windows)]
+    use libc::{LC_ALL, setlocale};
+    #[cfg(windows)]
     use winapi::shared::winerror::ERROR_ACCESS_DENIED;
 
     struct Buf<'a> {
@@ -100,10 +102,10 @@ mod test {
         end.is_some() && end.unwrap().is_ascii_alphanumeric() && !end.unwrap().is_whitespace()
     }
 
-    #[cfg(all(not(windows), not(target_os="macos")))]
+    #[cfg(not(target_os="macos"))]
     struct DefaultLocale;
 
-    #[cfg(all(not(windows), not(target_os="macos")))]
+    #[cfg(not(target_os="macos"))]
     impl Drop for DefaultLocale {
         fn drop(&mut self) {
             unsafe { setlocale(LC_ALL, b"\0".as_ptr() as *const _); }
@@ -114,7 +116,12 @@ mod test {
     #[test]
     fn localized_messages() {
         let _default_locale = DefaultLocale;
-        let locales: &[&'static [u8]] = &[b"en_US.UTF-8\0", b"ja_JP.EUC-JP\0", b"uk_UA.KOI8-U\0", b"uk_UA.UTF-8\0"];
+        let locales: &[&'static [u8]] = &[
+            b"en_US.UTF-8\0",
+            b"ja_JP.EUC-JP\0",
+            b"uk_UA.KOI8-U\0",
+            b"uk_UA.UTF-8\0"
+        ];
         for &locale in locales {
             unsafe { setlocale(LC_ALL, locale.as_ptr() as *const _) };
             let msg = match locale.split(|&b| b == b'.').next().unwrap() {
@@ -135,11 +142,19 @@ mod test {
     #[cfg(windows)]
     #[test]
     fn localized_messages() {
-        let mut buf = [0; 1024];
-        let buf = str::from_utf8_mut(&mut buf[..]).unwrap();
-        let mut buf = Buf { s: buf, len: 0 };
-        write!(&mut buf, "{}", Errno(ERROR_ACCESS_DENIED as u32 as i32)).unwrap();
-        let res = &buf.s[.. buf.len];
-        assert_eq!(res, "Access is denied.");
+        let _default_locale = DefaultLocale;
+        let locales: &[&'static [u8]] = &[
+            b"american-english_america.OCP\0",
+            b"chinese-traditional_china.OCP\0",
+        ];
+        for &locale in locales {
+            unsafe { setlocale(LC_ALL, locale.as_ptr() as *const _) };
+            let mut buf = [0; 1024];
+            let buf = str::from_utf8_mut(&mut buf[..]).unwrap();
+            let mut buf = Buf { s: buf, len: 0 };
+            write!(&mut buf, "{}", Errno(ERROR_ACCESS_DENIED as u32 as i32)).unwrap();
+            let res = &buf.s[.. buf.len];
+            assert_eq!(res, "Access is denied.");
+        }
     }
 }

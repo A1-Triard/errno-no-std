@@ -31,4 +31,5 @@ quickcheck = "1.0.3"
 quickcheck_macros = "1.0.0"
 
 [target.'cfg(windows)'.dev-dependencies]
+libc = { version = "0.2.124", default-features = false }
 winapi = { version = "*", features = ["winerror"] }
