@@ -132,17 +132,6 @@ mod test {
         }
     }
 
-    #[test]
-    fn error_display_d() {
-        let e = 120;
-        let mut buf = [0; 1024];
-        let buf = str::from_utf8_mut(&mut buf[..]).unwrap();
-        let mut buf = Buf { s: buf, len: 0 };
-        write!(&mut buf, "{}", Errno(e)).unwrap();
-        let res = &buf.s[.. buf.len];
-        assert_eq!(res, "err");
-    }
-
     #[cfg(windows)]
     #[test]
     fn localized_messages() {
