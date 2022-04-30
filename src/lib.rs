@@ -74,8 +74,9 @@ mod test {
 
     impl<'a> Write for Buf<'a> {
         fn write_str(&mut self, s: &str) -> fmt::Result {
-            self.s[self.len .. self.len.checked_add(s.len()).unwrap()].copy_from_str(s);
-            self.len = s.len();
+            let advanced_len = self.len.checked_add(s.len()).unwrap();
+            self.s[self.len .. advanced_len].copy_from_str(s);
+            self.len = advanced_len;
             Ok(())
         }
     }
