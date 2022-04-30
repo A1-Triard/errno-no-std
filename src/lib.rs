@@ -86,6 +86,7 @@ mod test {
         errno() == Errno(e)
     }
 
+    /*
     #[quickcheck]
     fn error_display(e: i32) -> bool {
         if e == 0 { return true; }
@@ -98,6 +99,7 @@ mod test {
         let end = res.chars().last();
         end.is_some() && end.unwrap().is_ascii_alphanumeric() && !end.unwrap().is_whitespace()
     }
+    */
 
     #[cfg(all(not(windows), not(target_os="macos")))]
     #[test]
