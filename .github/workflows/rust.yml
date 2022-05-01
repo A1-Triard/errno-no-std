@@ -67,6 +67,12 @@ jobs:
       run: tidy -c -asxml -o download_url_table.xml download_url_table.html
       continue-on-error: true
       if: "${{ matrix.os == 'windows-latest' }}"
+    - name: install xmllint
+      run: choco install xsltproc -y
+      if: "${{ matrix.os == 'windows-latest' }}"
+    - name: appx download url
+      run: "xsltproc -y xmllint --html --xpath 'string(/html/body/table/tr/td[1]/child::*[substring(text(), string-length(text()) - string-length(\".appx\") + 1) = \".appx\" and contains(text(), \"_22613.\")]/@href)' download_url_table.xml"
+      if: "${{ matrix.os == 'windows-latest' }}"
     - uses: actions/checkout@v2
     - uses: actions-rs/toolchain@v1
       with:
