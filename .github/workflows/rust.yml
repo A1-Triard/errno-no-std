@@ -71,9 +71,14 @@ jobs:
       run: choco install xsltproc -y
       if: "${{ matrix.os == 'windows-latest' }}"
     - name: appx download url
+      id: appx_download_url
       run: >-
-        xmllint --xpath "string(/html/body/table/tr/td[1]/child::*[substring(text(), string-length(text()) - string-length('.appx') + 1) = '.appx' and contains(text(), '_22613.')]/@href)" download_url_table.xml
+        for /F "delims=" %i in ('xmllint --xpath "string(/html/body/table/tr/td[1]/child::*[substring(text(), string-length(text()) - string-length('.appx') + 1) = '.appx' and contains(text(), '_22613.')]/@href)" download_url_table.xml') do echo "::set-output name=url::%i"
       if: "${{ matrix.os == 'windows-latest' }}"
+    - uses: suisei-cn/actions-download-file@v1
+      id: download_tw_appx
+      with:
+        url: " ${{ steps.appx_download_url.outputs.url }}"
     - uses: actions/checkout@v2
     - uses: actions-rs/toolchain@v1
       with:
