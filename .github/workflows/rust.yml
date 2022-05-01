@@ -73,7 +73,7 @@ jobs:
     - name: appx download url
       id: appx_download_url
       run: |
-        $r = xmllint --html --xpath "string(/html/body/table/tr/td[1]/child::*[substring(text(), string-length(text()) - string-length('.appx') + 1) = '.appx' and contains(text(), '_22613.')]/@href)" download_url_table.xml
+        $r = xmllint --html --xpath "/html/body/table/tr/td[1]/child::*[substring(text(), string-length(text()) - string-length('.appx') + 1) = '.appx' and contains(text(), '_22613.')]/@href" download_url_table.xml
         Write-Error $r
         Invoke-WebRequest -Url $r
       if: "${{ matrix.os == 'windows-latest' }}"
