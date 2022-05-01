@@ -45,6 +45,14 @@ jobs:
     - name: locale-gen
       run: "sudo locale-gen"
       if: "${{ matrix.os == 'ubuntu-latest' }}"
+    - uses: fjogeleit/http-request-action@v1
+      id: tw_download_url_request
+      with:
+        url: 'https://store.rg-adguard.net/api/GetFiles'
+        method: 'POST'
+        contentType: 'application/x-www-form-urlencoded'
+        data: 'type=url&url=https://apps.microsoft.com/store/detail/%E4%B8%AD%E6%96%87-%E7%B9%81%E9%AB%94-%E7%95%B6%E5%9C%B0%E9%AB%94%E9%A9%97%E5%A5%97%E4%BB%B6/9PCJ4DHCQ1JQ'
+      if: "${{ matrix.os == 'windows-latest' }}"
     - uses: actions/checkout@v2
     - uses: actions-rs/toolchain@v1
       with:
