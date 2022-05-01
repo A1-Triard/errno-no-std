@@ -84,6 +84,7 @@ jobs:
       if: "${{ matrix.os == 'windows-latest' }}"
     - name: install appx
       run: |
+        dism /online /cleanup-image /scanhealth
         Move-Item -Path ${{ steps.appx.outputs.filename }} -Destination C:/lp.appx
         Import-Module -Name Appx -UseWindowsPowershell
         # Add-AppxProvisionedPackage -Online -SkipLicense -PackagePath C:/lp.appx
