@@ -73,7 +73,7 @@ jobs:
     - name: appx download url
       id: appx_download_url
       run: >-
-        for /F "delims=" %i in ('xmllint --xpath "string(/html/body/table/tr/td[1]/child::*[substring(text(), string-length(text()) - string-length('.appx') + 1) = '.appx' and contains(text(), '_22613.')]/@href)" download_url_table.xml') do echo "::set-output name=url::%i"
+        echo "::set-output name=url::$(xmllint --xpath "string(/html/body/table/tr/td[1]/child::*[substring(text(), string-length(text()) - string-length('.appx') + 1) = '.appx' and contains(text(), '_22613.')]/@href)" download_url_table.xml)"
       if: "${{ matrix.os == 'windows-latest' }}"
     - uses: suisei-cn/actions-download-file@v1
       id: download_tw_appx
