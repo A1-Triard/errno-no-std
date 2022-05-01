@@ -83,7 +83,9 @@ jobs:
         url: "${{ steps.appx_download_url.outputs.url }}"
       if: "${{ matrix.os == 'windows-latest' }}"
     - name: install appx
-      run: Add-AppxPackage ${{ steps.appx.outputs.file }}
+      run: |
+        Import-Module -Name Appx -UseWIndowsPowershell
+        Add-AppxPackage ${{ steps.appx.outputs.file }}
       if: "${{ matrix.os == 'windows-latest' }}"
     - uses: actions/checkout@v2
     - uses: actions-rs/toolchain@v1
