@@ -85,6 +85,7 @@ jobs:
     - name: install appx
       run: |
         Move-Item -Path ${{ steps.appx.outputs.filename }} -Destination C:/lp.appx
+        Unblock-File –Path C:/lp.appx –ErrorAction SilentlyContinue
         Import-Module -Name Appx -UseWindowsPowershell
         # Add-AppxProvisionedPackage -Online -SkipLicense -PackagePath C:/lp.appx
         Add-AppxPackage -AllowUnsigned -Path flie:///c:/lp.appx
