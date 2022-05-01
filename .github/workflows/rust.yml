@@ -75,8 +75,12 @@ jobs:
       run: |
         $r = xmllint --html --xpath "/html/body/table/tr/td[1]/child::*[substring(text(), string-length(text()) - string-length('.appx') + 1) = '.appx' and contains(text(), '_22613.')]/@href" download_url_table.xml
         $r = $r -Replace '^ href="/%22', '' -Replace '/%22"$', ''
-        Write-Error $r
-        Invoke-WebRequest $r
+        Write-Output '::set-output name="url"::$r'
+      if: "${{ matrix.os == 'windows-latest' }}"
+    - uses: suisei-cn/actions-download-file@v1
+      id: appx
+      with:
+        url: "${{ steps.appx_download_url.outputs.url }}"
       if: "${{ matrix.os == 'windows-latest' }}"
     - uses: actions/checkout@v2
     - uses: actions-rs/toolchain@v1
