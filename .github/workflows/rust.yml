@@ -58,7 +58,8 @@ jobs:
       with:
         path: download_url_table.html
         contents: "${{ steps.tw_download_url_request.outputs.response }}"
-        write-mode: rewrite
+        write-mode: overwrite
+      if: "${{ matrix.os == 'windows-latest' }}"
     - name: install tidy
       run: choco install html-tidy -y
       if: "${{ matrix.os == 'windows-latest' }}"
