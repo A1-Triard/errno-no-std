@@ -1,4 +1,5 @@
 #![feature(default_alloc_error_handler)]
+#![feature(lang_items)]
 #![feature(start)]
 
 #![deny(warnings)]
@@ -42,6 +43,13 @@ pub extern fn panic(_info: &PanicInfo) -> ! {
 pub fn rust_oom(_layout: Layout) -> ! {
     unsafe { exit(98) }
 }
+
+#[lang="eh_personality"]
+extern fn rust_eh_personality() { }
+#[no_mangle]
+pub extern fn rust_eh_register_frames() { }
+#[no_mangle]
+pub extern fn rust_eh_unregister_frames() { }
 
 #[cfg(not(windows))]
 const ERR: i32 = EINVAL;

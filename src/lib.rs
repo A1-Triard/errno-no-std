@@ -138,23 +138,4 @@ mod test {
             assert_eq!(res, msg);
         }
     }
-
-    #[cfg(windows)]
-    #[test]
-    fn localized_messages() {
-        let _default_locale = DefaultLocale;
-        let locales: &[&'static [u8]] = &[
-            b"american-english_america.OCP\0",
-            b"chinese-traditional_china.OCP\0",
-        ];
-        for &locale in locales {
-            unsafe { setlocale(LC_ALL, locale.as_ptr() as *const _) };
-            let mut buf = [0; 1024];
-            let buf = str::from_utf8_mut(&mut buf[..]).unwrap();
-            let mut buf = Buf { s: buf, len: 0 };
-            write!(&mut buf, "{}", Errno(ERROR_ACCESS_DENIED as u32 as i32)).unwrap();
-            let res = &buf.s[.. buf.len];
-            assert_eq!(res, "Access is denied.");
-        }
-    }
 }
