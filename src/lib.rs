@@ -66,8 +66,6 @@ mod test {
     use libc::{LC_ALL, EACCES, setlocale};
     #[cfg(windows)]
     use libc::{LC_ALL, setlocale};
-    #[cfg(windows)]
-    use winapi::shared::winerror::ERROR_ACCESS_DENIED;
 
     struct Buf<'a> {
         s: &'a mut str,
