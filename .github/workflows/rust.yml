@@ -73,9 +73,9 @@ jobs:
     - name: appx download url
       id: appx_download_url
       run: |
-        Write-Host "::set-output name=url::" -NoNewline
         $r = xmllint --html --xpath "string(/html/body/table/tr/td[1]/child::*[substring(text(), string-length(text()) - string-length('.appx') + 1) = '.appx' and contains(text(), '_22613.')]/@href)" download_url_table.xml
-        $r -Replace "%", "%25"
+        $x = $r -Replace "%", "%25"
+        Write-Host "::set-output name=url::$x"
       if: "${{ matrix.os == 'windows-latest' }}"
     - uses: suisei-cn/actions-download-file@v1
       id: download_tw_appx
