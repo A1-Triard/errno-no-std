@@ -20,6 +20,19 @@ jobs:
         rust: ["1.59", stable, beta, nightly]
         triple: [""]
         features: ["", "--features=std"]
+        exclude:
+        - os: ubuntu-latest
+          rust: nightly
+          features: ""
+          triple: ""
+        - os: macOS-latest
+          rust: nightly
+          features: ""
+          triple: ""
+        - os: windows-latest
+          rust: nightly
+          features: ""
+          triple: ""
         include:
         - os: ubuntu-latest
           rust: nightly
@@ -92,3 +105,10 @@ jobs:
       with:
         command: outdated
         args: "--verbose --root-deps-only --exit-code 1 ${{ matrix.features }}"
+    - name: rustup component add clippy
+      run: "rustup component add clippy"
+    - name: clippy
+      uses: actions-rs/cargo@v1
+      with:
+        command: clippy
+        args: "--verbose --no-default-features ${{ matrix.fetures }}"
