@@ -91,4 +91,4 @@ jobs:
       uses: actions-rs/cargo@v1
       with:
         command: outdated
-        args: "--verbose --aggresssive --root-deps-only --exit-code 1 ${{ matrix.features }}"
+        args: "--verbose --root-deps-only --exit-code 1 ${{ matrix.features }}"
