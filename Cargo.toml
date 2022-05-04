@@ -1,8 +1,8 @@
 [package]
 edition = "2021"
-rust-version = "1.59"
 name = "errno-no-std"
 version = "0.0.3"
+rust-version = "1.59"
 authors = ["warlock <internalmike@gmail.com>"]
 description = "Cross-platform interface to the `errno` variable."
 readme = "README.md"
