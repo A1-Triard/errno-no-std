@@ -11,7 +11,7 @@ extern "C" {
 }
 
 fn write_byte(f: &mut Formatter, c: u8) -> fmt::Result {
-    write!(f, "\\x{:02x}", c)
+    write!(f, "\\x{:02X}", c)
 }
 
 fn write_fallback(f: &mut Formatter, s: &[u8]) -> fmt::Result {
@@ -50,11 +50,7 @@ impl Drop for Iconv {
     }
 }
 
-pub fn errno_fmt(e: i32, f: &mut Formatter) -> fmt::Result {
-    let msg = unsafe {
-        let msg = strerror(e) as *const c_char;
-        slice::from_raw_parts(msg as *const u8, strlen(msg))
-    };
+fn localized_msg_fmt(msg: &[u8], f: &mut Formatter) -> fmt::Result {
     let nl = unsafe {
         let nl = nl_langinfo(CODESET) as *const c_char;
         slice::from_raw_parts(nl as *const u8, strlen(nl) + 1)
@@ -80,22 +76,37 @@ pub fn errno_fmt(e: i32, f: &mut Formatter) -> fmt::Result {
             (&mut uni_buf_ptr) as *mut _,
             (&mut uni_buf_len) as *mut _
         )) };
-        if iconv_res == -1 && errno_raw() != E2BIG {
-            debug_assert!(msg_len > 0);
-            write_byte(f, msg[msg.len() - msg_len])?;
-            msg_ptr = unsafe { msg_ptr.add(1) };
-            msg_len -= 1;
+        let iconv_ok = if iconv_res == -1 {
+            if errno_raw() == E2BIG { None } else { Some(false) }
         } else {
-            let uni_len = uni_buf.len() - uni_buf_len;
-            let uni = &uni_buf[.. uni_len];
-            let uni = unsafe { str::from_utf8_unchecked(transmute(uni)) };
-            write!(f, "{}", uni)?;
-            if iconv_res != -1 {
+            Some(true)
+        };
+        let uni_len = uni_buf.len() - uni_buf_len;
+        let uni = &uni_buf[.. uni_len];
+        let uni = unsafe { str::from_utf8_unchecked(transmute(uni)) };
+        write!(f, "{}", uni)?;
+        match iconv_ok {
+            Some(true) => {
                 debug_assert_eq!(msg_len, 0);
                 return Ok(());
-            }
+            },
+            Some(false) => {
+                debug_assert!(msg_len > 0);
+                write_byte(f, msg[msg.len() - msg_len])?;
+                msg_ptr = unsafe { msg_ptr.add(1) };
+                msg_len -= 1;
+            },
+            None => { }
         }
     }
+}
+
+pub fn errno_fmt(e: i32, f: &mut Formatter) -> fmt::Result {
+    let msg = unsafe {
+        let msg = strerror(e) as *const c_char;
+        slice::from_raw_parts(msg as *const u8, strlen(msg))
+    };
+    localized_msg_fmt(msg, f)
 }
 
 pub fn errno_raw() -> i32 { 
@@ -105,5 +116,56 @@ pub fn errno_raw() -> i32 {
 pub fn set_errno_raw(e: i32) {
     unsafe {
         *errno_location() = e;
+    }
+}
+
+#[cfg(all(test, not(target_os="macos")))]
+mod test {
+    use copy_from_str::CopyFromStrExt;
+    use core::fmt::{self, Display, Formatter, Write};
+    use core::str::{self};
+    use libc::{LC_ALL, setlocale};
+    use crate::unix::localized_msg_fmt;
+
+    struct DefaultLocale;
+
+    impl Drop for DefaultLocale {
+        fn drop(&mut self) {
+            unsafe { setlocale(LC_ALL, b"\0".as_ptr() as *const _); }
+        }
+    }
+
+    struct Buf<'a> {
+        s: &'a mut str,
+        len: usize,
+    }
+
+    impl<'a> Write for Buf<'a> {
+        fn write_str(&mut self, s: &str) -> fmt::Result {
+            let advanced_len = self.len.checked_add(s.len()).unwrap();
+            self.s[self.len .. advanced_len].copy_from_str(s);
+            self.len = advanced_len;
+            Ok(())
+        }
+    }
+
+    struct LocalizedStr(&'static [u8]);
+
+    impl Display for LocalizedStr {
+        fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+            localized_msg_fmt(self.0, f)
+        }
+    }
+
+    #[test]
+    fn localized_msg_fmt_invalid_non_utf8_encoding() {
+        let _default_locale = DefaultLocale;
+        unsafe { setlocale(LC_ALL, "ja_JP.EUC-JP\0".as_ptr() as *const _) };
+        let mut buf = [0; 1024];
+        let buf = str::from_utf8_mut(&mut buf[..]).unwrap();
+        let mut buf = Buf { s: buf, len: 0 };
+        write!(&mut buf, "{}", LocalizedStr(b"\x8E\xA1\x8E\x69")).unwrap();
+        let res = &buf.s[.. buf.len];
+        assert_eq!(res, "｡\\x8Ei");
     }
 }
