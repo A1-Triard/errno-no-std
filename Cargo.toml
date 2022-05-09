@@ -1,7 +1,7 @@
 [package]
 edition = "2021"
 name = "errno-no-std"
-version = "0.0.3"
+version = "0.0.4"
 rust-version = "1.59"
 authors = ["warlock <internalmike@gmail.com>"]
 description = "Cross-platform interface to the `errno` variable."
