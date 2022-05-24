@@ -1,3 +1,5 @@
+![maintenance: actively developed](https://img.shields.io/badge/maintenance-actively--developed-brightgreen.svg)
+
 # errno-no-std
 
 Cross-platform interface to the `errno` variable.
