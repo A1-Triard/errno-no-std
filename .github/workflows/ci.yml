@@ -70,7 +70,7 @@ jobs:
       matrix:
         rust: ["1.59", stable, beta, nightly]
         os: [ubuntu-latest, macOS-latest]
-        target: [x86_64-unknown-linux-gnu, i686-unknown-linux-gnu, x86_64-pc-windows-gnu]
+        target: [x86_64-unknown-linux-gnu, i686-unknown-linux-gnu, x86_64-pc-windows-gnu, i686-pc-windows-gnu]
         exclude:
         - os: ubuntu-latest
           target: x86_64-unknown-linux-gnu
@@ -78,8 +78,6 @@ jobs:
           target: x86_64-apple-darwin
         - os: macOS-latest
           target: i686-unknown-linux-gnu
-        - os: macOS-latest
-          target: x86_64-pc-windows-gnu
     runs-on: ${{ matrix.os }}
     steps:
     - uses: actions-rs/toolchain@v1
