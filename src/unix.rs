@@ -3,8 +3,8 @@ use core::mem::{MaybeUninit, transmute};
 use core::slice::{self};
 use core::str::{self};
 use errno_sys::errno_location;
-use iconv_sys::*;
 use libc::{CODESET, E2BIG, c_char, c_int, nl_langinfo, strlen};
+use libc::{iconv, iconv_open, iconv_close, iconv_t};
 
 extern "C" {
     fn strerror(errnum: c_int) -> *mut c_char;
@@ -59,7 +59,7 @@ fn localized_msg_fmt(msg: &[u8], f: &mut Formatter) -> fmt::Result {
         return write_utf8_lossy(f, msg);
     }
     let c = unsafe { iconv_open(b"UTF-8\0".as_ptr() as _, nl.as_ptr() as _) };
-    if c == iconv_t::ERROR {
+    if c as usize == (-1isize) as usize {
         return write_fallback(f, msg);
     }
     let c = Iconv(c);

@@ -18,7 +18,6 @@ std = []
 
 [target.'cfg(not(windows))'.dependencies]
 errno-sys = "0.0.1"
-iconv-sys = "0.0.3"
 libc = { version = "0.2.124", default-features = false }
 
 [target.'cfg(windows)'.dependencies]
