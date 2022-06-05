@@ -61,8 +61,6 @@ mod test {
     use copy_from_str::CopyFromStrExt;
     use core::fmt::{self, Write};
     use core::str::{self};
-    #[cfg(all(not(windows), not(target_os="macos")))]
-    use panicking::panic;
     use quickcheck_macros::quickcheck;
     #[cfg(all(not(windows), not(target_os="macos")))]
     use libc::{LC_ALL, EACCES, setlocale};
