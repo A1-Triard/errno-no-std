@@ -108,7 +108,7 @@ pub fn errno_fmt(e: i32, f: &mut Formatter) -> fmt::Result {
     const BUF_SIZE: usize = 128;
 
     let mut buf: [c_char; BUF_SIZE] = [0; BUF_SIZE];
-    if unsafe { strerror_r(e, buf.as_mut_ptr(), BUF_SIZE) } < 0 {
+    if unsafe { strerror_r(e, buf.as_mut_ptr(), BUF_SIZE) } != 0 {
         return Err(fmt::Error);
     }
 
