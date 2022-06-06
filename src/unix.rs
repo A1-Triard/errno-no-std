@@ -7,6 +7,8 @@ use libc::{CODESET, E2BIG, c_char, c_int, nl_langinfo, strlen};
 use libc::{iconv, iconv_open, iconv_close, iconv_t};
 
 extern "C" {
+    // Avoid GNU strerror_r on Linux and Newlib systems
+    #[cfg_attr(any(target_os = "linux", target_env = "newlib"), link_name = "__xpg_strerror_r")]
     fn strerror_r(errnum: c_int, buf: *mut c_char, buflen: libc::size_t) -> c_int;
 }
 
