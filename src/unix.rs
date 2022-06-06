@@ -105,6 +105,7 @@ fn localized_msg_fmt(msg: &[u8], f: &mut Formatter) -> fmt::Result {
 
 pub fn errno_fmt(e: i32, f: &mut Formatter) -> fmt::Result {
     // 128 bytes should be long enough for all error messages
+    // "Proof": https://github.com/rust-lang/rust/blob/5176945ad49005b82789be5700f5ae0e6efe5481/library/std/src/sys/unix/os.rs#L31
     const BUF_SIZE: usize = 128;
 
     let mut buf: [c_char; BUF_SIZE] = [0; BUF_SIZE];
