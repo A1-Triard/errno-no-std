@@ -7,7 +7,9 @@ use libc::{CODESET, E2BIG, c_char, c_int, nl_langinfo, strlen};
 use libc::{iconv, iconv_open, iconv_close, iconv_t};
 
 extern "C" {
-    fn strerror(errnum: c_int) -> *mut c_char;
+    // Avoid GNU strerror_r on Linux and Newlib systems
+    #[cfg_attr(any(target_os = "linux", target_env = "newlib"), link_name = "__xpg_strerror_r")]
+    fn strerror_r(errnum: c_int, buf: *mut c_char, buflen: libc::size_t) -> c_int;
 }
 
 fn write_byte(f: &mut Formatter, c: u8) -> fmt::Result {
@@ -102,10 +104,17 @@ fn localized_msg_fmt(msg: &[u8], f: &mut Formatter) -> fmt::Result {
 }
 
 pub fn errno_fmt(e: i32, f: &mut Formatter) -> fmt::Result {
-    let msg = unsafe {
-        let msg = strerror(e) as *const c_char;
-        slice::from_raw_parts(msg as *const u8, strlen(msg))
-    };
+    // 128 bytes should be long enough for all error messages
+    // "Proof": https://github.com/rust-lang/rust/blob/5176945ad49005b82789be5700f5ae0e6efe5481/library/std/src/sys/unix/os.rs#L31
+    const BUF_SIZE: usize = 128;
+
+    let mut buf: [u8; BUF_SIZE] = [0; BUF_SIZE];
+    if unsafe { strerror_r(e, buf.as_mut_ptr() as *mut c_char, BUF_SIZE) } != 0 {
+        return Err(fmt::Error);
+    }
+
+    let msg = unsafe { slice::from_raw_parts(buf.as_ptr(), strlen(buf.as_ptr() as *const c_char)) };
+
     localized_msg_fmt(msg, f)
 }
 

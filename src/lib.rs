@@ -87,17 +87,26 @@ mod test {
         errno() == Errno(e)
     }
 
-    #[quickcheck]
-    fn error_display(e: i32) -> bool {
-        if e == 0 { return true; }
-        let mut buf = [0; 1024];
-        let buf = str::from_utf8_mut(&mut buf[..]).unwrap();
-        let mut buf = Buf { s: buf, len: 0 };
-        write!(&mut buf, "{}", Errno(e)).unwrap();
-        let res = &buf.s[.. buf.len];
-        assert!(res.len() > 5);
-        let end = res.chars().last();
-        end.is_some() && end.unwrap().is_ascii_alphanumeric() && !end.unwrap().is_whitespace()
+    #[test]
+    fn error_display() {
+        let valid_errnos = [
+            libc::E2BIG,
+            libc::EACCES,
+            libc::EADDRINUSE,
+            libc::EADDRNOTAVAIL,
+            libc::EAFNOSUPPORT,
+            libc::EAGAIN,
+        ];
+        for errno in valid_errnos {
+            let mut buf = [0; 1024];
+            let buf = str::from_utf8_mut(&mut buf[..]).unwrap();
+            let mut buf = Buf { s: buf, len: 0 };
+            write!(&mut buf, "{}", Errno(errno)).unwrap();
+            let res = &buf.s[.. buf.len];
+            assert!(res.len() > 5);
+            let end = res.chars().last().unwrap();
+            assert!(end.is_ascii_alphanumeric() && !end.is_whitespace() || end == '.', "Invalid message: '{}'", res);
+        }
     }
 
     #[cfg(not(target_os="macos"))]
