@@ -105,9 +105,7 @@ pub fn errno_fmt(e: i32, f: &mut Formatter) -> fmt::Result {
     // 128 bytes should be long enough for all error messages
     const BUF_SIZE: usize = 128;
 
-    // The cast is neessary for portability, since c_char is not necessarily i8.
-    #[allow(clippy::unnecessary_cast)]
-    let mut buf = [0 as c_char; BUF_SIZE];
+    let mut buf: [c_char; BUF_SIZE] = [0; BUF_SIZE];
     if unsafe { strerror_r(e, buf.as_mut_ptr(), BUF_SIZE) } < 0 {
         return Err(fmt::Error);
     }
