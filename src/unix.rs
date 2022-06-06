@@ -108,12 +108,12 @@ pub fn errno_fmt(e: i32, f: &mut Formatter) -> fmt::Result {
     // "Proof": https://github.com/rust-lang/rust/blob/5176945ad49005b82789be5700f5ae0e6efe5481/library/std/src/sys/unix/os.rs#L31
     const BUF_SIZE: usize = 128;
 
-    let mut buf: [c_char; BUF_SIZE] = [0; BUF_SIZE];
-    if unsafe { strerror_r(e, buf.as_mut_ptr(), BUF_SIZE) } != 0 {
+    let mut buf: [u8; BUF_SIZE] = [0; BUF_SIZE];
+    if unsafe { strerror_r(e, buf.as_mut_ptr() as *mut c_char, BUF_SIZE) } != 0 {
         return Err(fmt::Error);
     }
 
-    let msg = unsafe { slice::from_raw_parts(buf.as_ptr().cast::<u8>(), strlen(buf.as_ptr())) };
+    let msg = unsafe { slice::from_raw_parts(buf.as_ptr(), strlen(buf.as_ptr() as *const c_char)) };
 
     localized_msg_fmt(msg, f)
 }
