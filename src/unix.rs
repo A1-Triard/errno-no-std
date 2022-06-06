@@ -7,7 +7,7 @@ use libc::{CODESET, E2BIG, c_char, c_int, nl_langinfo, strlen};
 use libc::{iconv, iconv_open, iconv_close, iconv_t};
 
 extern "C" {
-    fn strerror(errnum: c_int) -> *mut c_char;
+    fn strerror_r(errnum: c_int, buf: *mut c_char, buflen: libc::size_t) -> c_int;
 }
 
 fn write_byte(f: &mut Formatter, c: u8) -> fmt::Result {
@@ -102,10 +102,18 @@ fn localized_msg_fmt(msg: &[u8], f: &mut Formatter) -> fmt::Result {
 }
 
 pub fn errno_fmt(e: i32, f: &mut Formatter) -> fmt::Result {
-    let msg = unsafe {
-        let msg = strerror(e) as *const c_char;
-        slice::from_raw_parts(msg as *const u8, strlen(msg))
-    };
+    // 128 bytes should be long enough for all error messages
+    const BUF_SIZE: usize = 128;
+
+    // The cast is neessary for portability, since c_char is not necessarily i8.
+    #[allow(clippy::unnecessary_cast)]
+    let mut buf = [0 as c_char; BUF_SIZE];
+    if unsafe { strerror_r(e, buf.as_mut_ptr(), BUF_SIZE) } < 0 {
+        return Err(fmt::Error);
+    }
+
+    let msg = unsafe { slice::from_raw_parts(buf.as_ptr().cast::<u8>(), strlen(buf.as_ptr())) };
+
     localized_msg_fmt(msg, f)
 }
 
