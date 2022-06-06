@@ -105,7 +105,7 @@ mod test {
             let res = &buf.s[.. buf.len];
             assert!(res.len() > 5);
             let end = res.chars().last().unwrap();
-            assert!(end.is_ascii_alphanumeric() && !end.is_whitespace());
+            assert!(end.is_ascii_alphanumeric() && !end.is_whitespace(), "Invalid message: '{}'", res);
         }
     }
 
