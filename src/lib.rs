@@ -13,14 +13,14 @@
 extern crate core;
 
 #[cfg(not(windows))]
-mod unix;
+mod posix;
 #[cfg(not(windows))]
-use unix::*;
+use posix::*;
 
 #[cfg(windows)]
-mod windows;
+mod winapi;
 #[cfg(windows)]
-use windows::*;
+use winapi::*;
 
 use core::fmt::{self, Formatter};
 #[cfg(feature="std")]
@@ -62,10 +62,6 @@ mod test {
     use core::fmt::{self, Write};
     use core::str::{self};
     use quickcheck_macros::quickcheck;
-    #[cfg(all(not(windows), not(target_os="macos")))]
-    use libc::{LC_ALL, EACCES, setlocale};
-    #[cfg(windows)]
-    use libc::{LC_ALL, setlocale};
 
     struct Buf<'a> {
         s: &'a mut str,
@@ -108,18 +104,38 @@ mod test {
             assert!(end.is_ascii_alphanumeric() && !end.is_whitespace() || end == '.', "Invalid message: '{}'", res);
         }
     }
+}
 
-    #[cfg(not(target_os="macos"))]
+#[cfg(all(test, not(windows), not(target_os="macos")))]
+mod test_localization {
+    use crate::*;
+    use copy_from_str::CopyFromStrExt;
+    use core::fmt::{self, Write};
+    use core::str::{self};
+    use libc::{LC_ALL, EACCES, setlocale};
+
+    struct Buf<'a> {
+        s: &'a mut str,
+        len: usize,
+    }
+
+    impl<'a> Write for Buf<'a> {
+        fn write_str(&mut self, s: &str) -> fmt::Result {
+            let advanced_len = self.len.checked_add(s.len()).unwrap();
+            self.s[self.len .. advanced_len].copy_from_str(s);
+            self.len = advanced_len;
+            Ok(())
+        }
+    }
+
     struct DefaultLocale;
 
-    #[cfg(not(target_os="macos"))]
     impl Drop for DefaultLocale {
         fn drop(&mut self) {
             unsafe { setlocale(LC_ALL, b"\0".as_ptr() as *const _); }
         }
     }
 
-    #[cfg(all(not(windows), not(target_os="macos")))]
     #[test]
     fn localized_messages() {
         let _default_locale = DefaultLocale;

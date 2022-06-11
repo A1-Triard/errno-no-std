@@ -134,7 +134,7 @@ mod test {
     use core::fmt::{self, Display, Formatter, Write};
     use core::str::{self};
     use libc::{LC_ALL, setlocale};
-    use crate::unix::localized_msg_fmt;
+    use crate::posix::localized_msg_fmt;
 
     struct DefaultLocale;
 
