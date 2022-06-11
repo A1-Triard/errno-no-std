@@ -110,7 +110,7 @@ pub fn errno_fmt(e: i32, f: &mut Formatter) -> fmt::Result {
 
     let mut buf: [u8; BUF_SIZE] = [0; BUF_SIZE];
     if unsafe { strerror_r(e, buf.as_mut_ptr() as *mut c_char, BUF_SIZE) } != 0 {
-        return Err(fmt::Error);
+        return write!(f, "error {}", e);
     }
 
     let msg = unsafe { slice::from_raw_parts(buf.as_ptr(), strlen(buf.as_ptr() as *const c_char)) };

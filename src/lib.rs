@@ -20,7 +20,7 @@ use posix::*;
 #[cfg(windows)]
 mod winapi;
 #[cfg(windows)]
-use winapi::*;
+use crate::winapi::*;
 
 use core::fmt::{self, Formatter};
 #[cfg(feature="std")]
@@ -83,26 +83,16 @@ mod test {
         errno() == Errno(e)
     }
 
-    #[test]
-    fn error_display() {
-        let valid_errnos = [
-            libc::E2BIG,
-            libc::EACCES,
-            libc::EADDRINUSE,
-            libc::EADDRNOTAVAIL,
-            libc::EAFNOSUPPORT,
-            libc::EAGAIN,
-        ];
-        for errno in valid_errnos {
-            let mut buf = [0; 1024];
-            let buf = str::from_utf8_mut(&mut buf[..]).unwrap();
-            let mut buf = Buf { s: buf, len: 0 };
-            write!(&mut buf, "{}", Errno(errno)).unwrap();
-            let res = &buf.s[.. buf.len];
-            assert!(res.len() > 5);
-            let end = res.chars().last().unwrap();
-            assert!(end.is_ascii_alphanumeric() && !end.is_whitespace() || end == '.', "Invalid message: '{}'", res);
-        }
+    #[quickcheck]
+    fn error_display(e: i32) -> bool {
+        let mut buf = [0; 1024];
+        let buf = str::from_utf8_mut(&mut buf[..]).unwrap();
+        let mut buf = Buf { s: buf, len: 0 };
+        write!(&mut buf, "{}", Errno(e)).unwrap();
+        let res = &buf.s[.. buf.len];
+        if res.len() <= 5 { return false; }
+        let end = res.chars().last().unwrap();
+        end.is_ascii_alphanumeric() && !end.is_whitespace() || end == '.'
     }
 }
 
