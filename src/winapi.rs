@@ -1,7 +1,7 @@
 use core::fmt::{self, Formatter};
 use core::ptr::{null, null_mut};
 use core::slice::{self};
-use widestring::UStr;
+use widestring::U16Str;
 use winapi::shared::minwindef::{DWORD, LPVOID};
 use winapi::shared::ntdef::{LANG_NEUTRAL, LPWSTR, MAKELANGID, SUBLANG_DEFAULT};
 use winapi::um::errhandlingapi::{GetLastError, SetLastError};
@@ -32,7 +32,7 @@ pub fn errno_fmt(e: i32, f: &mut Formatter) -> fmt::Result {
     let buf = Buf(buf);
     let msg = unsafe { slice::from_raw_parts(buf.0, msg_len as usize) };
     let trim = msg.iter().copied().rev().take_while(|&w| w == b'\r' as u16 || w == b'\n' as u16).count();
-    let msg = UStr::from_slice(&msg[.. msg.len() - trim]);
+    let msg = U16Str::from_slice(&msg[.. msg.len() - trim]);
     write!(f, "{}", msg.display())
 }
 
