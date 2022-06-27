@@ -12,15 +12,23 @@
 #[cfg(feature="std")]
 extern crate core;
 
-#[cfg(not(windows))]
+#[cfg(all(not(windows), not(custom_errno)))]
 mod posix;
-#[cfg(not(windows))]
+#[cfg(all(not(windows), not(custom_errno)))]
 use posix::*;
 
-#[cfg(windows)]
+#[cfg(all(windows, not(custom_errno)))]
 mod winapi;
-#[cfg(windows)]
+#[cfg(all(windows, not(custom_errno)))]
 use crate::winapi::*;
+
+#[cfg(custom_errno)]
+mod custom;
+#[cfg(custom_errno)]
+use custom::*;
+
+#[cfg(custom_errno)]
+pub use custom::{CustomErrno, set_custom_errno};
 
 use core::fmt::{self, Formatter};
 #[cfg(feature="std")]
