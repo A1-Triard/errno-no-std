@@ -42,6 +42,31 @@ jobs:
     - run: "cargo build --verbose --release --no-default-features ${{ matrix.features }}"
     - run: "cargo outdated --verbose --root-deps-only --exit-code 1 ${{ matrix.features }}"
     - run: "cargo clippy --verbose --no-default-features ${{ matrix.features }}"
+  custom_errno:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macOS-latest, windows-latest]
+        rust: ["1.59", stable, beta, nightly]
+        features: ["", "--features=std"]
+    env:
+      RUSTFLAGS: "--cfg=custom_errno"
+      RUSTDOCFLAGS: "--cfg=custom_errno"
+    runs-on: ${{ matrix.os }}
+    steps:
+    - uses: actions-rs/toolchain@v1
+      with:
+        toolchain: ${{ matrix.rust }}
+        override: true
+    - run: "rustup component add clippy"
+    - uses: actions/checkout@v2
+    - run: "cargo build --verbose --no-default-features ${{ matrix.features }}"
+    - run: "cargo test --verbose --tests --no-default-features ${{ matrix.features }} -- --test-threads=1"
+    - run: "cargo test --verbose --doc --no-default-features ${{ matrix.features }}"
+    - run: "cargo doc --verbose --no-default-features ${{ matrix.features }}"
+    - run: "cargo build --verbose --release --no-default-features ${{ matrix.features }}"
+    - run: "cargo outdated --verbose --root-deps-only --exit-code 1 ${{ matrix.features }}"
+    - run: "cargo clippy --verbose --no-default-features ${{ matrix.features }}"
   ensure_no_std:
     strategy:
       fail-fast: false
