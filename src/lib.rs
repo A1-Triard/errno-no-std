@@ -12,6 +12,9 @@
 #[cfg(feature="std")]
 extern crate core;
 
+#[cfg(test)]
+extern crate std;
+
 #[cfg(all(not(windows), not(custom_errno)))]
 mod posix;
 #[cfg(all(not(windows), not(custom_errno)))]
