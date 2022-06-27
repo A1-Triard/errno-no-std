@@ -27,9 +27,6 @@ mod custom;
 #[cfg(custom_errno)]
 use custom::*;
 
-#[cfg(custom_errno)]
-pub use custom::{CustomErrno, set_custom_errno};
-
 use core::fmt::{self, Formatter};
 #[cfg(feature="std")]
 use std::error::Error;
@@ -71,6 +68,30 @@ mod test {
     use core::str::{self};
     use quickcheck_macros::quickcheck;
 
+    #[cfg(custom_errno)]
+    mod custom_errno {
+        use std::cell::Cell;
+        use std::fmt::{self, Formatter};
+        use std::thread_local;
+
+        thread_local! {
+            static ERRNO: Cell<i32> = Cell::new(0);
+        }
+
+        #[no_mangle]
+        extern "Rust" fn rust_errno() -> i32 { ERRNO.with(|x| x.get()) }
+
+        #[no_mangle]
+        extern "Rust" fn rust_set_errno(e: i32) {
+            ERRNO.with(|x| x.set(e))
+        }
+
+        #[no_mangle]
+        extern "Rust" fn rust_errno_fmt(e: i32, f: &mut Formatter) -> fmt::Result {
+            write!(f, "Error {}", e)
+        }
+    }
+
     struct Buf<'a> {
         s: &'a mut str,
         len: usize,
@@ -104,7 +125,7 @@ mod test {
     }
 }
 
-#[cfg(all(test, not(windows), not(target_os="macos")))]
+#[cfg(all(test, not(windows), not(target_os="macos"), not(custom_errno)))]
 mod test_localization {
     use crate::*;
     use copy_from_str::CopyFromStrExt;
