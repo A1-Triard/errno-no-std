@@ -11,8 +11,8 @@ panic = "abort"
 panic = "abort"
 
 [dependencies]
-libc_alloc = "1.0.3"
 errno-no-std = { path = "..", default-features = false }
+exit-no-std = "0.2.0"
 
 [target.'cfg(not(windows))'.dependencies]
 libc = { version = "0.2", default-features = false }
