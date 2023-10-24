@@ -17,7 +17,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, macOS-latest, windows-latest]
-        rust: ["1.59", stable, beta, nightly]
+        rust: ["1.71", stable, beta, nightly]
         features: ["", "--features=std"]
     runs-on: ${{ matrix.os }}
     steps:
@@ -47,7 +47,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, macOS-latest, windows-latest]
-        rust: ["1.59", stable, beta, nightly]
+        rust: ["1.71", stable, beta, nightly]
         features: ["", "--features=std"]
     env:
       RUSTFLAGS: "--cfg=custom_errno"
@@ -93,7 +93,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        rust: ["1.59", stable, beta, nightly]
+        rust: ["1.71", stable, beta, nightly]
         os: [ubuntu-latest, macOS-latest]
         target: [x86_64-unknown-linux-gnu, i686-unknown-linux-gnu, x86_64-pc-windows-gnu, i686-pc-windows-gnu]
         exclude:
