@@ -7,6 +7,7 @@
 #![doc(test(attr(deny(warnings))))]
 #![doc(test(attr(allow(dead_code))))]
 #![doc(test(attr(allow(unused_variables))))]
+#![allow(clippy::unnecessary_cast)]
 
 #![cfg_attr(not(feature="std"), no_std)]
 #[cfg(feature="std")]
