@@ -68,7 +68,7 @@ pub fn set_errno(err: Errno) { set_errno_raw(err.0) }
 mod test {
     use crate::*;
     use copy_from_str::CopyFromStrExt;
-    use core::fmt::{self, Write};
+    use core::fmt::{Write};
     use core::str::{self};
     use quickcheck_macros::quickcheck;
 
@@ -133,7 +133,7 @@ mod test {
 mod test_localization {
     use crate::*;
     use copy_from_str::CopyFromStrExt;
-    use core::fmt::{self, Write};
+    use core::fmt::{Write};
     use core::str::{self};
     use libc::{LC_ALL, EACCES, setlocale};
 
