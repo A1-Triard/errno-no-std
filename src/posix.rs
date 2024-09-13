@@ -85,7 +85,7 @@ fn localized_msg_fmt(msg: &[u8], f: &mut Formatter) -> fmt::Result {
         };
         let uni_len = uni_buf.len() - uni_buf_len;
         let uni = &uni_buf[.. uni_len];
-        let uni = unsafe { str::from_utf8_unchecked(transmute(uni)) };
+        let uni = unsafe { str::from_utf8_unchecked(transmute::<&[MaybeUninit<u8>], &[u8]>(uni)) };
         write!(f, "{}", uni)?;
         match iconv_ok {
             Some(true) => {

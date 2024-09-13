@@ -1,7 +1,7 @@
 [package]
 edition = "2021"
 name = "errno-no-std"
-version = "0.2.1"
+version = "0.2.2"
 rust-version = "1.71"
 authors = ["warlock <internalmike@gmail.com>"]
 description = "Cross-platform interface to the `errno` variable."
@@ -12,9 +12,16 @@ categories = ["os", "no-std"]
 license = "MIT OR Apache-2.0"
 repository = "https://github.com/A1-Triard/errno-no-std"
 
+[lints.rust]
+unexpected_cfgs = { level = "allow" }
+
 [features]
 default = ["std"]
+## disable to make the library `#![no_std]`.
 std = []
+
+[dependencies]
+document-features = "0.2.7"
 
 [target.'cfg(all(not(windows), not(custom_errno)))'.dependencies]
 errno-sys = "0.2.0"

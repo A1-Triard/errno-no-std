@@ -1,7 +1,5 @@
-//! **Crate features**
-//!
-//! * `"std"`
-//! Enabled by default. Disable to make the library `#![no_std]`.
+//! ## Feature flags
+#![doc=document_features::document_features!()]
 
 #![deny(warnings)]
 #![doc(test(attr(deny(warnings))))]
